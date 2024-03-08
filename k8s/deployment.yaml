@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-web-postgres
+  labels:
+    app: springboot-web-postgres
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: springboot-web-postgres
+  template:
+    metadata:
+      name: springboot-web-postgres
+      labels:
+        app: springboot-web-postgres
+    spec:
+      containers:
+        - name: springboot-web-postgres
+          image: gildastema/springboot-k8s-web-postgres:1.0-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "1024Mi"
+              cpu: "1024m"
+            limits:
+              memory: "1024Mi"
+              cpu: "1024m"
+          env:
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: db_user
+                  name: springboot-web-postgres-config
+            - name: DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: db_password
+                  name: springboot-web-postgres-config
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: db_url
+                  name: springboot-web-postgres-config
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: "/actuator/health/liveness"
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: "/actuator/health/readiness"
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
