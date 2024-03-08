@@ -1,2 +1,7 @@
-package com.gildastema.springbootcruddemo.repositories;public class EmployeeRepository {
+package com.gildastema.springbootcruddemo.repositories;
+
+import com.gildastema.springbootcruddemo.entities.Employee;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface EmployeeRepository  extends JpaRepository<Employee, Long> {
 }
