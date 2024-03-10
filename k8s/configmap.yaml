@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: springboot-web-postgres-config
 data:
-  db_user: <user>
-  db_password: <password>
-  db_url: "jdbc:postgresql://<url>"
+  db_user: "gildastema3"
+  db_password: "Y0RykwN1KUSD"
+  db_url: "jdbc:postgresql://ep-sparkling-star-a23nvn4c.eu-central-1.aws.neon.tech/neondb?sslmode=require"
