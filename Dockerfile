@@ -7,5 +7,7 @@ RUN ./gradlew  build -x test
 
 FROM openjdk:17-jdk-alpine
 COPY --from=builder /app/source/build/libs/*.jar ./app/app.jar
+COPY --from=builder /app/source/.docker/entrypoint.sh entrypoint.sh
+CMD chmod +x entrypoint.sh
 EXPOSE 8080
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","./app/app.jar"]
+ENTRYPOINT ["./entrypoint.sh"]

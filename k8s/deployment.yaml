@@ -13,11 +13,13 @@ spec:
     metadata:
       annotations:
         vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-inject-secret-db : "secrets/database/credentials"
+        vault.hashicorp.com/agent-inject-secret-database : "secrets/database/credentials"
         vault.hashicorp.com/role: "app"
-        vault.hashicorp.com/agent-inject-template-db: |
+        vault.hashicorp.com/agent-inject-template-database: |
           {{- with secret "secrets/database/credentials" -}}
-            export abcd="{{ .Data.user }}"
+            export DB_USER="{{ .Data.user }}"
+            export DB_PASSWORD="{{ .Data.password }}"
+            export DB_URL="{{ .Data.url }}"
           {{- end }}
       name: springboot-web-postgres
       labels:
@@ -26,37 +28,22 @@ spec:
       serviceAccountName: springboot-web-postgres-sa
       containers:
         - name: springboot-web-postgres
-          image: gildastema/springboot-k8s-web-postgres:1.0-SNAPSHOT
+          image: gildastema/springboot-k8s-web-postgres:1.1-SNAPSHOT
           imagePullPolicy: Always
-          args:
-            ['sh', '-c', 'source /vault/secrets/db']
           ports:
             - containerPort: 8080
-#          resources:
-#            requests:
-#              memory: "1024Mi"
-#              cpu: "1024m"
-#            limits:
-#              memory: "1024Mi"
-#              cpu: "1024m"
-          env:
-            - name: BASH_ENV
-              value: /vault/secrets/db
-            - name: DB_USER
-              valueFrom:
-                configMapKeyRef:
-                  key: db_user
-                  name: springboot-web-postgres-config
-            - name: DB_PASSWORD
-              valueFrom:
-                configMapKeyRef:
-                  key: db_password
-                  name: springboot-web-postgres-config
-            - name: DB_URL
-              valueFrom:
-                configMapKeyRef:
-                  key: db_url
-                  name: springboot-web-postgres-config
+          # resources:
+          #  requests:
+          #    memory: "512Mi"
+          #    cpu: "512m"
+          #  limits:
+          #    memory: "1024Mi"
+          #    cpu: "1024m"
+          env: 
+              - name: VAULT_SECRET_DIRECTORY
+                value: /vault/secrets
+              - name: VAULT_SECRET_PATH
+                value: /vault/secrets/database
           livenessProbe:
             httpGet:
               port: 8080
